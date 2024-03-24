@@ -71,20 +71,20 @@ def main():
     noise_optimizer = torch.optim.SGD(noise_params, lr=anp_eps / anp_steps)
 
     # Step 3: train backdoored models
-    print('Iter \t lr \t Time \t TrainLoss \t TrainACC \t PoisonLoss \t PoisonACC \t CleanLoss \t CleanACC')
-    nb_repeat = int(np.ceil(nb_iter / print_every))
-    for i in range(nb_repeat):
-        start = time.time()
-        lr = mask_optimizer.param_groups[0]['lr']
-        train_loss, train_acc = mask_train(model=net, criterion=criterion, data_loader=clean_val_loader,
-                                           mask_opt=mask_optimizer, noise_opt=noise_optimizer,device=device,anp_steps=anp_steps,anp_eps=anp_eps,anp_alpha=anp_alpha)
-        cl_test_loss, cl_test_acc = test(model=net, criterion=criterion, data_loader=clean_test_loader,device=device)
-        po_test_loss, po_test_acc = test(model=net, criterion=criterion, data_loader=poison_test_loader,device=device)
-        end = time.time()
-        print('{} \t {:.3f} \t {:.1f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f}'.format(
-            (i + 1) * print_every, lr, end - start, train_loss, train_acc, po_test_loss, po_test_acc,
-            cl_test_loss, cl_test_acc))
-    save_mask_scores(net.state_dict(), os.path.join(output_dir, 'mask_values.txt'))
+    # print('Iter \t lr \t Time \t TrainLoss \t TrainACC \t PoisonLoss \t PoisonACC \t CleanLoss \t CleanACC')
+    # nb_repeat = int(np.ceil(nb_iter / print_every))
+    # for i in range(nb_repeat):
+    #     start = time.time()
+    #     lr = mask_optimizer.param_groups[0]['lr']
+    #     train_loss, train_acc = mask_train(model=net, criterion=criterion, data_loader=clean_val_loader,
+    #                                        mask_opt=mask_optimizer, noise_opt=noise_optimizer,device=device,anp_steps=anp_steps,anp_eps=anp_eps,anp_alpha=anp_alpha)
+    #     cl_test_loss, cl_test_acc = test(model=net, criterion=criterion, data_loader=clean_test_loader,device=device)
+    #     po_test_loss, po_test_acc = test(model=net, criterion=criterion, data_loader=poison_test_loader,device=device)
+    #     end = time.time()
+    #     print('{} \t {:.3f} \t {:.1f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f} \t {:.4f}'.format(
+    #         (i + 1) * print_every, lr, end - start, train_loss, train_acc, po_test_loss, po_test_acc,
+    #         cl_test_loss, cl_test_acc))
+    # save_mask_scores(net.state_dict(), os.path.join(output_dir, 'mask_values.txt'))
 
 
     # step 4 : pruning
@@ -98,12 +98,12 @@ def main():
     if pruning_by == 'threshold':
         results = evaluate_by_threshold(
             net, mask_values, pruning_max=pruning_max, pruning_step=pruning_step,
-            criterion=criterion, clean_loader=clean_test_loader, poison_loader=poison_test_loader
+            criterion=criterion, clean_loader=clean_test_loader, poison_loader=poison_test_loader,device=device
         )
     else:
         results = evaluate_by_number(
             net, mask_values, pruning_max=pruning_max, pruning_step=pruning_step,
-            criterion=criterion, clean_loader=clean_test_loader, poison_loader=poison_test_loader
+            criterion=criterion, clean_loader=clean_test_loader, poison_loader=poison_test_loader,device=device
         )
     file_name = os.path.join(output_dir, 'pruning_by_{}.txt'.format(pruning_by))
     with open(file_name, "w") as f:
