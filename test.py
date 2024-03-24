@@ -8,6 +8,9 @@ from dataset import split_dataset,add_predefined_trigger_cifar,add_trigger_cifar
 from batchnorm import transfer_bn_to_noisy_bn
 from anp_utils import mask_train,clip_mask,save_mask_scores,test,reset,evaluate_by_number,evaluate_by_threshold,read_data
 from torchvision.datasets import CIFAR10
+'''
+下面这些参数是需要调整的超参数
+'''
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 trigger_info = None
@@ -20,10 +23,12 @@ nb_iter = 2000
 anp_eps=0.4
 anp_steps=1
 anp_alpha=0.2
-pruning_by='threshold'
+# pruning_by='threshold'
+pruning_by='number'
 pruning_max=0.90
 pruning_step=0.05
 def main():
+
     MEAN_CIFAR10 = (0.4914, 0.4822, 0.4465)
     STD_CIFAR10 = (0.2023, 0.1994, 0.2010)
     transform_train = transforms.Compose([
